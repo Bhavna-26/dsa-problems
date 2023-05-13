@@ -1,0 +1,51 @@
+struct TrieNode{
+    int freq;
+    TrieNode* child[26];
+    TrieNode(){
+        freq=0;
+        for(int i=0;i<26;i++)child[i]=NULL;
+    }
+}
+;
+void insert(struct TrieNode *root, string key)
+{
+    // code here
+  TrieNode* curr=root;
+  for(int i=0;i<key.length();i++){
+      int idx=key[i]-'a';
+      
+      if((curr->child[idx])==NULL){
+          TrieNode* n=new TrieNode();
+          curr->child[idx]=n;
+          
+      }
+      curr->freq++;
+      curr=curr->child[idx];
+     
+  }
+   
+}
+string buildPrefix(TrieNode* root,string key){
+    string res="";
+    TrieNode* curr=root;
+    for(int i=0;i<key.length();i++){
+        int idx=key[i]-'a';
+        if(curr->freq==1)break;
+        res+=key[i];
+        curr=curr->child[idx];
+    }
+    return res;
+}
+
+class Solution
+{
+    public:
+    vector<string> findPrefixes(string arr[], int n)
+    {
+        //code here
+        vector<string>ans;
+        TrieNode* root=new TrieNode();
+        for(int i=0;i<n;i++){insert(root,arr[i]);}
+        for(int i=0;i<n;i++){ans.push_back(buildPrefix(root,arr[i]));}
+        return ans;
+    }

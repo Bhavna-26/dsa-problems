@@ -1,0 +1,101 @@
+struct TrieNode {
+    struct TrieNode *children[26];
+
+    // isLeaf is true if the node represents
+    // end of a word
+    bool isLeaf;
+    TrieNode(){
+        isLeaf=false;
+        for(int i=0;i<26;i++)children[i]=NULL;
+    }
+};
+
+
+//Function to insert string into TRIE.
+void insert(struct TrieNode *root, string key)
+{
+    // code here
+  TrieNode* curr=root;
+  for(int i=0;i<key.length();i++){
+      int idx=key[i]-'a';
+      
+      if((curr->children[idx])==NULL){
+          TrieNode* n=new TrieNode();
+          curr->children[idx]=n;
+          
+      }
+      curr=curr->children[idx];
+     
+  }
+   curr->isLeaf=true;
+}
+void printSuggestions(TrieNode *curr,vector<string>&temp,string prefix){
+    if(curr->isLeaf){
+        temp.push_back(prefix);
+        // no return statement because as we proceed we could see that next would be null
+    }
+    for(char ch='a';ch<='z';ch++){
+        TrieNode *next=curr->children[ch-'a'];
+        if(next!=NULL){
+            prefix.push_back(ch);
+            printSuggestions(next,temp,prefix);
+            prefix.pop_back();
+        }
+    }
+}
+vector<vector<string>> getSuggestions(TrieNode *root,string s){
+   vector<vector<string>>ans;
+   TrieNode *prev=root;
+   string prefix="";
+   for(int i=0;i<s.length();i++){
+       char lastch=s[i];
+       prefix.push_back(lastch);
+       TrieNode *curr=prev->children[lastch-'a'];
+       if(curr==NULL)break;
+       
+           vector<string>temp;
+           printSuggestions(curr,temp,prefix);
+           ans.push_back(temp);
+           temp.clear();
+           prev=curr;
+       
+   }
+   return ans;
+}
+class Solution{
+public:
+    vector<vector<string>> displayContacts(int n, string contact[], string s)
+    {
+        // code here
+        TrieNode* root=new TrieNode();
+        for(int i=0;i<n;i++){
+            insert(root,contact[i]);
+        }
+        return getSuggestions(root,s);
+    }
+};
+
+//{ Driver Code Starts.
+
+int main(){
+    int t;
+    cin>>t;
+    while(t--){
+        int n;
+        cin>>n;
+        string contact[n], s;
+        for(int i = 0;i < n;i++)
+            cin>>contact[i];
+        cin>>s;
+        
+        Solution ob;
+        vector<vector<string>> ans = ob.displayContacts(n, contact, s);
+        for(int i = 0;i < s.size();i++){
+            for(auto u: ans[i])
+                cout<<u<<" ";
+            cout<<"\n";
+        }
+    }
+    return 0;
+}
+// } Driver Code Ends
